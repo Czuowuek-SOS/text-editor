@@ -6,7 +6,7 @@
 #include <ctype.h>
 
 #if defined _WIN32
-    #include <windows.h>
+    #include <Windows.h>
     #include <conio.h>
 #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__) || defined(__APPLE__)
     #include <unistd.h>
@@ -26,14 +26,17 @@
 #endif
 
 #define newl    '\n'
+#define tab     '\t'
+#define space   ' '
 
 #define red     "\033[31m"
 #define green   "\033[32m"
-#define blue    "\033[34m"
 #define yellow  "\033[33m"
+#define blue    "\033[34m"
 #define magenta "\033[35m"
 #define cyan    "\033[36m"
 #define white   "\033[37m"
+#define fiolet  "\033[38m"
 
 #define reset   "\033[0m"
 
@@ -50,9 +53,9 @@ void clear(void);
 
 
 
-extern char input[512];
+char input[512];
 bool program_started = false;
-int main(int argc, char *argv[2])
+int main(int argc, char *argv[1])
 {
     atexit([]()
     {   
@@ -94,10 +97,23 @@ int main(int argc, char *argv[2])
                 fprintf(fp, "%s", input);
                 break;
             }
+            case CTRL('r'):
+            {
+                FILE *fp2 = fopen("program.exe", "r");
+                if (fp2 != NULL)
+                {
+                    fclose(fp2);
+                    remove("program.exe");
+                }
+                clear();
+                system("g++ main.cpp -o program.exe && .\\program.exe");
+
+                std::cout << "Press any key to continue..." << newl;
+                getch();
+            }
             // special characters
             case '\n':
             {
-                std::cout << "~" << '\r' << newl << newl;
                 line_count++;
                 break;
             }
@@ -121,10 +137,10 @@ int main(int argc, char *argv[2])
 
                 input[input_count] = c;
                 input_count++;
-                std::cout << c;
                 break;
             }
         }
+        screen_refresh();
     }
     
 
@@ -137,19 +153,68 @@ void screen_refresh(void)
 
     for(int i = 0 ; i < sizeof(input) / sizeof(input[0]) ; i++)
     {
-        if(input[i] == '\0')
+        char previos_char = input[--i];
+        char next_char = input[++i];
+
+        switch (input[i])
         {
-            break;
-        }
-        else if(input[i] == '\n')
-        {
-            std::cout << line_Sep << newl;
-        }
-        else
-        {
-            std::cout << input[i];
+            case '\0':
+            {
+                break;
+            }
+            case '\n':
+            {
+                if (next_char == '\n')
+                {
+                    std::cout << line_Sep << newl;
+                }
+                else
+                {
+                    std::cout << newl;
+                }
+                break;
+            }
+            case space:
+            {
+                std::cout << reset <<space;
+            }
+
+            default:
+            {
+                if (next_char == 'i' && ++next_char == 'n' && ++next_char == 't')
+                {
+                    std::cout << blue;
+                }
+                else if (next_char == 'c' && ++next_char == 'h' && ++next_char == 'a' && ++next_char == 'r')
+                {
+                    std::cout << blue;
+                }
+                else if (next_char == 's' && ++next_char == 't' && ++next_char == 'r' && ++next_char == 'i' && ++next_char == 'n' && ++next_char == 'g')
+                {
+                    std::cout << green;
+                }
+                else if (next_char == 'f' && ++next_char == 'l' && ++next_char == 'o' && ++next_char == 'a' && ++next_char == 't')
+                {
+                    std::cout << blue;
+                }
+                else if (next_char == 'd' && ++next_char == 'o' && ++next_char == 'u' && ++next_char == 'b' && ++next_char == 'l' && ++next_char == 'e')
+                {
+                    std::cout << blue;
+                }
+                else if (next_char == 'w' && ++next_char == 'h' && ++next_char == 'i' && ++next_char == 't' && ++next_char == 'e')
+                {
+                    std::cout << fiolet;
+                }
+                else if (next_char == 'f', ++next_char == 'o' && ++next_char == 'r')
+                {
+                    std::cout << fiolet;
+                }
+
+                std::cout << input[i];
+            }
         }
     }
+    Sleep(0.1);
 }
 
 
