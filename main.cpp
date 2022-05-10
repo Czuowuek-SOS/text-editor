@@ -209,6 +209,7 @@ void screen_refresh(void)
     for(int i = 0 ; i < sizeof(input) / sizeof(input[0]) ; i++)
     {
         char previos_char = input[--i];
+        char current_char = input[i];
         char next_char = input[++i];
 
         switch (input[i])
@@ -236,33 +237,29 @@ void screen_refresh(void)
 
             default:
             {
-                if (next_char == 'i' && ++next_char == 'n' && ++next_char == 't')
+                if(input[++i] == 'i' && input[++i] == 'n' && input[++i] == 't')
                 {
-                    std::cout << blue;
+                    std::cout << blue << input[i] << reset;
                 }
-                else if (next_char == 'c' && ++next_char == 'h' && ++next_char == 'a' && ++next_char == 'r')
+                else if(input[++i] == 's' && input[++i] == 't' && input[++i] == 'r' && input[++i] == 'i' && input[++i] == 'n' && input[++i] == 'g')
                 {
-                    std::cout << blue;
+                    std::cout << green << input[i] << reset;
                 }
-                else if (next_char == 's' && ++next_char == 't' && ++next_char == 'r' && ++next_char == 'i' && ++next_char == 'n' && ++next_char == 'g')
+                else if(input[++i] == 'c' && input[++i] == 'h' && input[++i] == 'a' && input[++i] == 'r')
                 {
-                    std::cout << green;
+                    std::cout << blue << input[i] << reset;
                 }
-                else if (next_char == 'f' && ++next_char == 'l' && ++next_char == 'o' && ++next_char == 'a' && ++next_char == 't')
+                else if(input[++i] == 'f' && input[++i] == 'l' && input[++i] == 'o' && input[++i] == 'w' && input[++i] == 'e' && input[++i] == 'r')
                 {
-                    std::cout << blue;
+                    std::cout << blue << input[i] << reset;
                 }
-                else if (next_char == 'd' && ++next_char == 'o' && ++next_char == 'u' && ++next_char == 'b' && ++next_char == 'l' && ++next_char == 'e')
+                else if(input[++i] == '(')
                 {
-                    std::cout << blue;
+                    std::cout << magenta << input[i] << reset;
                 }
-                else if (next_char == 'w' && ++next_char == 'h' && ++next_char == 'i' && ++next_char == 't' && ++next_char == 'e')
+                else if(input[++i] == ')')
                 {
-                    std::cout << fiolet;
-                }
-                else if (next_char == 'f', ++next_char == 'o' && ++next_char == 'r')
-                {
-                    std::cout << fiolet;
+                    std::cout << magenta << input[i] << reset;
                 }
 
                 std::cout << input[i];
@@ -274,5 +271,6 @@ void screen_refresh(void)
 
 void clear(void)
 {
-    std::cout << "\033[2J\033[1;1H";
+    system("cls");
+    //std::cout << "\033[2J\033[1;1H";
 }
