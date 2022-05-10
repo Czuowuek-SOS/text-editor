@@ -43,6 +43,11 @@
 
 #define CTRL(k) ((k) & 0x1f)
 
+#define arrow_up    72
+#define arrow_down  80
+#define arrow_left  75
+#define arrow_right 77
+
 //#define line_Sep "\033[32m ~ \033[0m"
 #define line_Sep " ~ "
 
@@ -57,6 +62,9 @@ char input[512];
 bool program_started = false;
 int main(int argc, char *argv[1])
 {
+    std::cout << (int)arrow_left << newl;
+    std::cout << (int)newl << newl;
+    
     atexit([]()
     {   
         if(program_started) {clear();}
@@ -110,6 +118,53 @@ int main(int argc, char *argv[1])
 
                 std::cout << "Press any key to continue..." << newl;
                 getch();
+            }
+            // arrow keys
+            case arrow_up:
+            {
+                if (input_count > 0)
+                {
+                    line_count--;
+                    input_count--;
+                    screen_refresh();
+                }
+                break;
+            }
+            case arrow_down:
+            {
+                if (input_count < strlen(input))
+                {
+                    line_count++;
+                    input_count++;
+                    screen_refresh();
+                }
+                break;
+            }
+            case arrow_left:
+            {
+                if (input_count > 0)
+                {
+                    input_count--;
+                    if(input[input_count] == '\n')
+                    {
+                        line_count--;
+                    }
+                    screen_refresh();
+                }
+                break;
+            }
+            case arrow_right:
+            {
+                if (input_count < strlen(input))
+                {
+                    input_count++;
+                    if(input[input_count] == '\n')
+                    {
+                        line_count++;
+                    }
+                    screen_refresh();
+                }
+                break;
             }
             // special characters
             case '\n':
@@ -214,7 +269,6 @@ void screen_refresh(void)
             }
         }
     }
-    Sleep(0.1);
 }
 
 
