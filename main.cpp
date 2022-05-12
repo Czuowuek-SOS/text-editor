@@ -53,7 +53,9 @@
 
 using std::string;
 
+void load_file(FILE *fp);
 void screen_refresh(void);
+void moveCursor(int x, int y);
 void clear(void);
 
 
@@ -62,12 +64,13 @@ char input[512];
 bool program_started = false;
 int main(int argc, char *argv[1])
 {
-    std::cout << (int)arrow_left << newl;
-    std::cout << (int)newl << newl;
     
     atexit([]()
     {   
-        if(program_started) {clear();}
+        if(program_started)
+        {
+            clear();
+        }
     });
 
     if (argc < 1)
@@ -177,8 +180,10 @@ int main(int argc, char *argv[1])
                 if (input_count > 0)
                 {
                     input_count--;
-                    input[input_count] = '\0';
-                    std::cout << "\b \b";
+                    for(int i = input_count ; i < strlen(input) ; i++)
+                    {
+                        input[i] = input[i + 1];
+                    }
                 }
                 break;
             }
@@ -206,7 +211,7 @@ void screen_refresh(void)
 {
     clear();
 
-    for(int i = 0 ; i < sizeof(input) / sizeof(input[0]) ; i++)
+    for(int i = 0 ; i < sizeof(input) ; i++)
     {
         char previos_char = input[--i];
         char current_char = input[i];
@@ -220,14 +225,17 @@ void screen_refresh(void)
             }
             case '\n':
             {
+                std::cout << newl;
+                /*
                 if (next_char == '\n')
                 {
-                    std::cout << line_Sep << newl;
+                    std::cout << newl;
                 }
                 else
                 {
                     std::cout << newl;
                 }
+                */
                 break;
             }
             case space:
@@ -236,7 +244,9 @@ void screen_refresh(void)
             }
 
             default:
-            {
+            {   
+                /* syntax highlighting
+
                 if(input[++i] == 'i' && input[++i] == 'n' && input[++i] == 't')
                 {
                     std::cout << blue << input[i] << reset;
@@ -261,7 +271,7 @@ void screen_refresh(void)
                 {
                     std::cout << magenta << input[i] << reset;
                 }
-
+                */
                 std::cout << input[i];
             }
         }
@@ -269,8 +279,38 @@ void screen_refresh(void)
 }
 
 
+void load_file(FILE* fp)
+{   
+    int i = 0;
+    char c;
+    while (true)
+    {
+        c = fgetc(fp);
+        if (c != EOF)
+        {
+            input[i] = c;
+            i++;
+        }
+        else
+        {
+            input[i] = '\0';
+            break;
+        }
+
+    }
+}
+
+void moveCursor(int x, int y)
+{
+    printf("\033[%d;%dH", y, x);
+}
+
 void clear(void)
 {
-    system("cls");
+    #if defined(_WIN32)
+        system("cls");
+    #else
+        system("clear");
+    #endif
     //std::cout << "\033[2J\033[1;1H";
 }
