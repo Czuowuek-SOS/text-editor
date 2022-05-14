@@ -59,12 +59,10 @@ void moveCursor(int x, int y);
 void clear(void);
 
 
-
 char input[512];
 bool program_started = false;
 int main(int argc, char *argv[1])
 {
-    
     atexit([]()
     {   
         if(program_started)
@@ -85,7 +83,11 @@ int main(int argc, char *argv[1])
         exit(1);
     }
 
+    //make variables with terminal size
+
+
     clear();
+    // load_file(fp);
     program_started = true;
     int input_count = 0;
     int line_count = 1;
@@ -97,18 +99,18 @@ int main(int argc, char *argv[1])
         switch (c)
         {
             // macros
-            case CTRL('q'):
+            case CTRL('Q'):
             {
                 exit(0);
                 break;
             }
-            case CTRL('s'):
+            case CTRL('S'):
             {
                 fseek(fp, 0, SEEK_END);
                 fprintf(fp, "%s", input);
                 break;
             }
-            case CTRL('r'):
+            case CTRL('R'):
             {
                 FILE *fp2 = fopen("program.exe", "r");
                 if (fp2 != NULL)
@@ -169,10 +171,13 @@ int main(int argc, char *argv[1])
                 }
                 break;
             }
-            // special characters
+            // ansi escape sequences
             case '\n':
             {
                 line_count++;
+                input_count++;
+
+                input[input_count] = c;
                 break;
             }
             case '\b':
@@ -213,9 +218,16 @@ void screen_refresh(void)
 
     for(int i = 0 ; i < sizeof(input) ; i++)
     {
-        char previos_char = input[--i];
-        char current_char = input[i];
-        char next_char = input[++i];
+        char previos_char   = input[--i];
+        char next_char      = input[++i];
+
+        int line_length;
+        if(input[i] == '\n')
+        {
+            line_length = i;
+            break;
+        }
+
 
         switch (input[i])
         {
@@ -223,7 +235,7 @@ void screen_refresh(void)
             {
                 break;
             }
-            case '\n':
+            case newl: // '\n'
             {
                 std::cout << newl;
                 /*
@@ -238,7 +250,12 @@ void screen_refresh(void)
                 */
                 break;
             }
-            case space:
+            case tab: // '\t'
+            {
+                std::cout << "   ";
+                break;
+            }
+            case space: // ' '
             {
                 std::cout << reset <<space;
             }
