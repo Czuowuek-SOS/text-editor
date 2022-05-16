@@ -8,9 +8,12 @@
 #if defined _WIN32
     #include <Windows.h>
     #include <conio.h>
+    // for eliminate error
+    #define STD_OUTPUT_HANDLE (DWORD)(0xfffffff5)
 #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__) || defined(__APPLE__)
     #include <unistd.h>
     #include <termios.h>
+    #include <ioctl.h>
     char getch()
     {
         struct termios oldt, newt;
@@ -58,7 +61,12 @@ void screen_refresh(void);
 void moveCursor(int x, int y);
 void clear(void);
 
+// cursor position
+int cursor_x = 0;
+int cursor_y = 0;
 
+int width;
+int height;
 char input[512];
 bool program_started = false;
 int main(int argc, char *argv[1])
@@ -83,14 +91,35 @@ int main(int argc, char *argv[1])
         exit(1);
     }
 
-    //make variables with terminal size
+    // get terminal size
+    #ifdef _WIN32
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        int ret;
+        ret = GetConsoleScreenBufferInfo(GetStdHandle( STD_OUTPUT_HANDLE ),&csbi);
+        if(ret)
+        {
+            int weight = csbi.dwSize.X;
+            int height = csbi.dwSize.Y;
+        }
+        else
+        {
+            std::cout << red << "Error getting terminal size" << reset << newl;
+            exit(1);
+        }
+
+    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__) || defined(__APPLE__)
+        struct winsize w;
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+        width = w.ws_col;
+        height = w.ws_row;
+    #endif
 
 
     clear();
     // load_file(fp);
     program_started = true;
     int input_count = 0;
-    int line_count = 1;
+    int line_count  = 1;
     char c;
     while (true)
     {
@@ -131,6 +160,8 @@ int main(int argc, char *argv[1])
                 {
                     line_count--;
                     input_count--;
+
+                    cursor_y--;
                     screen_refresh();
                 }
                 break;
@@ -141,6 +172,8 @@ int main(int argc, char *argv[1])
                 {
                     line_count++;
                     input_count++;
+
+                    cursor_y++;
                     screen_refresh();
                 }
                 break;
@@ -153,6 +186,12 @@ int main(int argc, char *argv[1])
                     if(input[input_count] == '\n')
                     {
                         line_count--;
+                        cursor_y--;
+                        cursor_x = 0;
+                    }
+                    else
+                    {
+                        cursor_x--;
                     }
                     screen_refresh();
                 }
@@ -166,6 +205,13 @@ int main(int argc, char *argv[1])
                     if(input[input_count] == '\n')
                     {
                         line_count++;
+                        cursor_y++;
+
+                        cursor_x = 0;
+                    }
+                    else
+                    {
+                        cursor_x++;
                     }
                     screen_refresh();
                 }
@@ -185,6 +231,17 @@ int main(int argc, char *argv[1])
                 if (input_count > 0)
                 {
                     input_count--;
+                    if(input[input_count] == '\n')
+                    {
+                        line_count--;
+                        cursor_y--;
+                        cursor_x = 0;
+                    }
+                    else
+                    {
+                        cursor_x--;
+                    }
+                    
                     for(int i = input_count ; i < strlen(input) ; i++)
                     {
                         input[i] = input[i + 1];
@@ -216,17 +273,11 @@ void screen_refresh(void)
 {
     clear();
 
+    int line_length;
     for(int i = 0 ; i < sizeof(input) ; i++)
     {
         char previos_char   = input[--i];
         char next_char      = input[++i];
-
-        int line_length;
-        if(input[i] == '\n')
-        {
-            line_length = i;
-            break;
-        }
 
 
         switch (input[i])
@@ -238,16 +289,7 @@ void screen_refresh(void)
             case newl: // '\n'
             {
                 std::cout << newl;
-                /*
-                if (next_char == '\n')
-                {
-                    std::cout << newl;
-                }
-                else
-                {
-                    std::cout << newl;
-                }
-                */
+                line_length++;
                 break;
             }
             case tab: // '\t'
@@ -293,6 +335,7 @@ void screen_refresh(void)
             }
         }
     }
+    moveCursor(cursor_y, cursor_x);
 }
 
 
@@ -321,6 +364,7 @@ void moveCursor(int x, int y)
 {
     printf("\033[%d;%dH", y, x);
 }
+
 
 void clear(void)
 {
