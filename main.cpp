@@ -8,12 +8,13 @@
 #if defined _WIN32
     #include <Windows.h>
     #include <conio.h>
-    // for eliminate error
+    /* for eliminate error */
     #define STD_OUTPUT_HANDLE (DWORD)(0xfffffff5)
 #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__) || defined(__APPLE__)
+    #include <cstring>
     #include <unistd.h>
     #include <termios.h>
-    #include <ioctl.h>
+    #include <sys/ioctl.h>
     char getch()
     {
         struct termios oldt, newt;
@@ -25,6 +26,22 @@
         ch = getchar();
         tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
         return ch;
+    }
+
+    void raw_mode(bool set)
+    {
+        static struct termios oldt, newt;
+        if (set)
+        {
+            tcgetattr(STDIN_FILENO, &oldt);
+            newt = oldt;
+            newt.c_lflag &= ~(ICANON | ECHO);
+            tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+        }
+        else
+        {
+            tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+        }
     }
 #endif
 
@@ -51,8 +68,13 @@
 #define arrow_left  75
 #define arrow_right 77
 
+#define esc         27
+
 //#define line_Sep "\033[32m ~ \033[0m"
 #define line_Sep " ~ "
+
+#define scroll_up(n)     printf("\033[%dS", n);
+#define scroll_down(n)   printf("\033[%dT", n);
 
 using std::string;
 
@@ -98,12 +120,12 @@ int main(int argc, char *argv[1])
         ret = GetConsoleScreenBufferInfo(GetStdHandle( STD_OUTPUT_HANDLE ),&csbi);
         if(ret)
         {
-            int weight = csbi.dwSize.X;
-            int height = csbi.dwSize.Y;
+            width  = csbi.dwSize.X;
+            height = csbi.dwSize.Y;
         }
         else
         {
-            std::cout << red << "Error getting terminal size" << reset << newl;
+            std::cout << red << "Error getting terminal size - 0" << reset << newl;
             exit(1);
         }
 
@@ -113,7 +135,11 @@ int main(int argc, char *argv[1])
         width = w.ws_col;
         height = w.ws_row;
     #endif
-
+    if (width == 0 || height == 0)
+    {
+        std::cout << red << "Error getting terminal size - 1" << reset << newl;
+        exit(1);
+    }
 
     clear();
     // load_file(fp);
@@ -162,7 +188,6 @@ int main(int argc, char *argv[1])
                     input_count--;
 
                     cursor_y--;
-                    screen_refresh();
                 }
                 break;
             }
@@ -174,7 +199,6 @@ int main(int argc, char *argv[1])
                     input_count++;
 
                     cursor_y++;
-                    screen_refresh();
                 }
                 break;
             }
@@ -193,7 +217,6 @@ int main(int argc, char *argv[1])
                     {
                         cursor_x--;
                     }
-                    screen_refresh();
                 }
                 break;
             }
@@ -213,7 +236,6 @@ int main(int argc, char *argv[1])
                     {
                         cursor_x++;
                     }
-                    screen_refresh();
                 }
                 break;
             }
@@ -223,7 +245,7 @@ int main(int argc, char *argv[1])
                 line_count++;
                 input_count++;
 
-                input[input_count] = c;
+                input[input_count] = '\n';
                 break;
             }
             case '\b':
@@ -241,7 +263,7 @@ int main(int argc, char *argv[1])
                     {
                         cursor_x--;
                     }
-                    
+
                     for(int i = input_count ; i < strlen(input) ; i++)
                     {
                         input[i] = input[i + 1];
@@ -274,6 +296,7 @@ void screen_refresh(void)
     clear();
 
     int line_length;
+    int line_count = 1;
     for(int i = 0 ; i < sizeof(input) ; i++)
     {
         char previos_char   = input[--i];
@@ -289,7 +312,8 @@ void screen_refresh(void)
             case newl: // '\n'
             {
                 std::cout << newl;
-                line_length++;
+                line_length = 0;
+                line_count++;
                 break;
             }
             case tab: // '\t'
@@ -304,33 +328,14 @@ void screen_refresh(void)
 
             default:
             {   
-                /* syntax highlighting
+                if (line_length == width || line_count == height)
+                {
+                    exit(-7);
+                    std::cout << newl;
+                    line_length = 0;
+                    line_count++;
+                }
 
-                if(input[++i] == 'i' && input[++i] == 'n' && input[++i] == 't')
-                {
-                    std::cout << blue << input[i] << reset;
-                }
-                else if(input[++i] == 's' && input[++i] == 't' && input[++i] == 'r' && input[++i] == 'i' && input[++i] == 'n' && input[++i] == 'g')
-                {
-                    std::cout << green << input[i] << reset;
-                }
-                else if(input[++i] == 'c' && input[++i] == 'h' && input[++i] == 'a' && input[++i] == 'r')
-                {
-                    std::cout << blue << input[i] << reset;
-                }
-                else if(input[++i] == 'f' && input[++i] == 'l' && input[++i] == 'o' && input[++i] == 'w' && input[++i] == 'e' && input[++i] == 'r')
-                {
-                    std::cout << blue << input[i] << reset;
-                }
-                else if(input[++i] == '(')
-                {
-                    std::cout << magenta << input[i] << reset;
-                }
-                else if(input[++i] == ')')
-                {
-                    std::cout << magenta << input[i] << reset;
-                }
-                */
                 std::cout << input[i];
             }
         }
