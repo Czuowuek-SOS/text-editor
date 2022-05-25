@@ -58,6 +58,16 @@
 #define white   "\033[37m"
 #define fiolet  "\033[38m"
 
+#define bg_red     "\033[41m"
+#define bg_green   "\033[42m"
+#define bg_yellow  "\033[43m"
+#define bg_blue    "\033[44m"
+#define bg_magenta "\033[45m"
+#define bg_cyan    "\033[46m"
+#define bg_white   "\033[47m"
+#define bg_fiolet  "\033[48m"
+
+
 #define reset   "\033[0m"
 
 
@@ -117,7 +127,7 @@ int main(int argc, char *argv[1])
     #ifdef _WIN32
         CONSOLE_SCREEN_BUFFER_INFO csbi;
         int ret;
-        ret = GetConsoleScreenBufferInfo(GetStdHandle( STD_OUTPUT_HANDLE ),&csbi);
+        ret = GetConsoleScreenBufferInfo(GetStdHandle( STD_OUTPUT_HANDLE ), &csbi);
         if(ret)
         {
             width  = csbi.dwSize.X;
@@ -239,6 +249,20 @@ int main(int argc, char *argv[1])
                 }
                 break;
             }
+            // scroll screen
+            /*
+            case CTRL(arrow_up):
+            {
+                scroll_up(1);
+                break;
+            }
+
+            case CTRL(arrow_down):
+            {
+                scroll_down(1);
+                break;
+            }
+            */
             // ansi escape sequences
             case '\n':
             {
@@ -274,8 +298,9 @@ int main(int argc, char *argv[1])
             // normal characters
             default:
             {
-                if (iscntrl(c) != 0)
+                if (iscntrl(c) != 0 && c != '\n')
                 {
+                    std::cout << yellow << (int)c << reset << newl;
                     break;
                 }
 
@@ -295,8 +320,8 @@ void screen_refresh(void)
 {
     clear();
 
-    int line_length;
-    int line_count = 1;
+    int line_length = 0;
+    int line_count  = 1;
     for(int i = 0 ; i < sizeof(input) ; i++)
     {
         char previos_char   = input[--i];
@@ -323,7 +348,9 @@ void screen_refresh(void)
             }
             case space: // ' '
             {
-                std::cout << reset <<space;
+                std::cout << space;
+                line_length++;
+                break;
             }
 
             default:
@@ -341,6 +368,8 @@ void screen_refresh(void)
         }
     }
     moveCursor(cursor_y, cursor_x);
+    string info = "lines: " + std::to_string(line_count) + " | " + "chars: " + std::to_string(sizeof(input));
+    std::cout << bg_blue << info << ' '*(width - info.length()) << reset << newl;
 }
 
 
@@ -373,10 +402,10 @@ void moveCursor(int x, int y)
 
 void clear(void)
 {
-    #if defined(_WIN32)
-        system("cls");
-    #else
-        system("clear");
-    #endif
-    //std::cout << "\033[2J\033[1;1H";
+    // #if defined(_WIN32)
+    //     system("cls");
+    // #else
+    //     system("clear");
+    // #endif
+    std::cout << "\033[2J\033[1;1H";
 }
