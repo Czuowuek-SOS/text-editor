@@ -148,6 +148,7 @@ int main(int argc, char *argv[1])
     #endif
     if (width == 0 || height == 0)
     {
+        clear();
         std::cout << red << "Error getting terminal size - 1" << reset << newl;
         exit(1);
     }
@@ -157,6 +158,7 @@ int main(int argc, char *argv[1])
     program_started = true;
     int input_count = 0;
     int line_count  = 1;
+    int line_length = 0;
     char c;
     while (true)
     {
@@ -292,6 +294,7 @@ int main(int argc, char *argv[1])
                     else
                     {
                         cursor_x--;
+                        
                     }
 
                     for(int i = input_count ; i < strlen(input) ; i++)
@@ -304,14 +307,22 @@ int main(int argc, char *argv[1])
             // normal characters
             default:
             {
-                if (iscntrl(c) != 0 && c != '\n' && c != 13)
+                
+                if (iscntrl(c) != 0 && c != '\n' && c != 13 && c != '\b' && c != '\r' && c != '\t')
                 {
-                    std::cout << yellow << (int)c << reset << newl;
+                    // std::cout << yellow << (int)c << reset << newl;
                     break;
                 }
+                
+
+            //    if (isCntrlKey(c))
+            //    {
+            //        break;
+            //    }
 
                 input[input_count] = c;
                 input_count++;
+                line_length++;
                 break;
             }
         }
@@ -420,7 +431,7 @@ void load_file(FILE* fp)
     }
 }
 
-bool isCtrlKey(int c)
+bool isCtrlKey(char c)
 {
     return c == CTRL(c);
 }
