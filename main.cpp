@@ -90,6 +90,7 @@ using std::string;
 
 void load_file(FILE *fp);
 void screen_refresh(void);
+bool isCntrlKey(char c);
 void moveCursor(int x, int y);
 void clear(void);
 
@@ -264,7 +265,7 @@ int main(int argc, char *argv[1])
             }
             */
             // ansi escape sequences
-            case '\n':
+            case 13:
             {
                 line_count++;
                 input_count++;
@@ -298,7 +299,7 @@ int main(int argc, char *argv[1])
             // normal characters
             default:
             {
-                if (iscntrl(c) != 0 && c != '\n')
+                if (iscntrl(c) != 0 && c != '\n' && c != 13)
                 {
                     std::cout << yellow << (int)c << reset << newl;
                     break;
@@ -334,7 +335,7 @@ void screen_refresh(void)
             {
                 break;
             }
-            case newl: // '\n'
+            case '\n': // '\n' - newl
             {
                 std::cout << newl;
                 line_length = 0;
@@ -368,6 +369,11 @@ void screen_refresh(void)
         }
     }
     moveCursor(cursor_y, cursor_x);
+    for(int i = 0 ; i < (height - line_count) ; i++)
+    {
+        std::cout << newl;
+    }
+
     string info = "lines: " + std::to_string(line_count) + " | " + "chars: " + std::to_string(sizeof(input));
     std::cout << bg_blue << info << ' '*(width - info.length()) << reset << newl;
 }
@@ -392,6 +398,11 @@ void load_file(FILE* fp)
         }
 
     }
+}
+
+bool isCtrlKey(int c)
+{
+    return c == CTRL(c);
 }
 
 void moveCursor(int x, int y)
