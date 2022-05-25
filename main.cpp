@@ -172,6 +172,11 @@ int main(int argc, char *argv[1])
             }
             case CTRL('S'):
             {
+                if (sizeof(input) > 512)
+                {
+                    std::cout << red << "File too big" << reset << newl;
+                    exit(1);
+                }
                 fseek(fp, 0, SEEK_END);
                 fprintf(fp, "%s", input);
                 break;
@@ -369,13 +374,28 @@ void screen_refresh(void)
         }
     }
     moveCursor(cursor_y, cursor_x);
+
+    int chars_count = 0;
+    for(int i = 0 ; i < sizeof(input) ; i++)
+    {
+        if(input[i] != '\0')
+        {
+            chars_count++;
+        }
+    }
+
     for(int i = 0 ; i < (height - line_count) ; i++)
     {
         std::cout << newl;
     }
-
-    string info = "lines: " + std::to_string(line_count) + " | " + "chars: " + std::to_string(sizeof(input));
-    std::cout << bg_blue << info << ' '*(width - info.length()) << reset << newl;
+    string info = "lines: " + std::to_string(line_count) + " | " + "chars: " + std::to_string(chars_count);
+    std::cout << bg_blue << info;
+    for(int i = 0 ; i < (width - info.length()) ; i++)
+    {
+        std::cout << space;
+    }
+    std::cout << reset;
+    
 }
 
 
