@@ -156,6 +156,7 @@ int main(int argc, char *argv[1])
     clear();
     // load_file(fp);
     program_started = true;
+    int lines_size[height];
     int input_count = 0;
     int line_count  = 1;
     int line_length = 0;
@@ -198,28 +199,32 @@ int main(int argc, char *argv[1])
                 getch();
             }
             // arrow keys
+
+            
             case arrow_up:
             {
-                if (input_count > 0)
-                {
-                    line_count--;
-                    input_count--;
+                // if (input_count > 0)
+                // {
+                //     line_count--;
+                //     input_count--;
 
-                    cursor_y--;
-                }
-                break;
+                //     cursor_y--;
+                // }
+                // break;
             }
             case arrow_down:
             {
-                if (input_count < strlen(input))
-                {
-                    line_count++;
-                    input_count++;
+                // if (input_count < strlen(input))
+                // {
+                //     line_count++;
+                //     input_count++;
 
-                    cursor_y++;
-                }
-                break;
+                //     cursor_y++;
+                // }
+                // break;
             }
+            
+
             case arrow_left:
             {
                 if (input_count > 0)
@@ -229,7 +234,7 @@ int main(int argc, char *argv[1])
                     {
                         line_count--;
                         cursor_y--;
-                        cursor_x = 0;
+                        cursor_x = lines_size[line_count];
                     }
                     else
                     {
@@ -294,9 +299,9 @@ int main(int argc, char *argv[1])
                     else
                     {
                         cursor_x--;
-                        
+                        lines_size[line_count]--;
                     }
-
+                    input[input_count] = 0;
                     for(int i = input_count ; i < strlen(input) ; i++)
                     {
                         input[i] = input[i + 1];
@@ -384,8 +389,7 @@ void screen_refresh(void)
             }
         }
     }
-    moveCursor(cursor_y, cursor_x);
-
+    std::cout << '\n';
     int chars_count = 0;
     for(int i = 0 ; i < sizeof(input) ; i++)
     {
@@ -395,9 +399,9 @@ void screen_refresh(void)
         }
     }
 
-    for(int i = 0 ; i < (height - line_count) ; i++)
+    for(int i = 0 ; i < (height - line_count) - 1 ; i++)
     {
-        std::cout << newl;
+        std::cout << green << "~" << reset << newl;
     }
     string info = "lines: " + std::to_string(line_count) + " | " + "chars: " + std::to_string(chars_count);
     std::cout << bg_blue << info;
@@ -406,7 +410,7 @@ void screen_refresh(void)
         std::cout << space;
     }
     std::cout << reset;
-    
+    moveCursor(cursor_y, cursor_x);
 }
 
 
