@@ -155,6 +155,7 @@ int main(int argc, char *argv[1])
 
     clear();
     // load_file(fp);
+    screen_refresh();
     program_started = true;
     int lines_size[height];
     int input_count = 0;
