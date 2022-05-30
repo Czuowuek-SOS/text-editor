@@ -211,7 +211,7 @@ int main(int argc, char *argv[1])
 
                 //     cursor_y--;
                 // }
-                // break;
+                break;
             }
             case arrow_down:
             {
@@ -222,7 +222,7 @@ int main(int argc, char *argv[1])
 
                 //     cursor_y++;
                 // }
-                // break;
+                break;
             }
             
 
@@ -291,6 +291,13 @@ int main(int argc, char *argv[1])
                 if (input_count > 0)
                 {
                     input_count--;
+                    if(input_count < strlen(input))
+                    {
+                        for(int i = input_count; i < strlen(input); i++)
+                        {
+                            input[i] = input[i + 1];
+                        }
+                    }
                     if(input[input_count] == '\n')
                     {
                         line_count--;
@@ -325,6 +332,14 @@ int main(int argc, char *argv[1])
             //    {
             //        break;
             //    }
+                if (input_count < strlen(input))
+                {
+                    for(int i = 0 ; i < strlen(input) - input_count ; i++)
+                    {
+                        input[input_count + i] = input[input_count + i + 1];
+                    }
+                }
+                cursor_x++;
 
                 input[input_count] = c;
                 input_count++;
@@ -413,7 +428,6 @@ void screen_refresh(void)
     std::cout << reset;
     moveCursor(cursor_y, cursor_x);
 }
-
 
 void load_file(FILE* fp)
 {   
