@@ -95,8 +95,8 @@ void moveCursor(int x, int y);
 void clear(void);
 
 // cursor position
-int cursor_x = 0;
-int cursor_y = 0;
+int cursor_x = 1;
+int cursor_y = 1;
 
 int width;
 int height;
@@ -169,6 +169,11 @@ int main(int argc, char *argv[1])
         switch (c)
         {
             // macros
+            case esc:
+            {
+                exit(0);
+                break;
+            }
             case CTRL('Q'):
             {
                 exit(0);
@@ -282,8 +287,10 @@ int main(int argc, char *argv[1])
             {
                 line_count++;
                 input_count++;
-
                 input[input_count] = '\n';
+
+                cursor_y++;
+                cursor_x = 1;
                 break;
             }
             case '\b':
@@ -426,7 +433,7 @@ void screen_refresh(void)
         std::cout << space;
     }
     std::cout << reset;
-    moveCursor(cursor_y, cursor_x);
+    moveCursor(cursor_x, cursor_y);
 }
 
 void load_file(FILE* fp)
