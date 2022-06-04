@@ -283,16 +283,7 @@ int main(int argc, char *argv[1])
             }
             */
             // ansi escape sequences
-            case 13:
-            {
-                line_count++;
-                input_count++;
-                input[input_count] = '\n';
 
-                cursor_y++;
-                cursor_x = 1;
-                break;
-            }
             case '\b':
             {
                 if (input_count > 0)
@@ -327,18 +318,26 @@ int main(int argc, char *argv[1])
             // normal characters
             default:
             {
-                
-                if (iscntrl(c) != 0 && c != '\n' && c != 13 && c != '\b' && c != '\r' && c != '\t')
+                if (input_count > sizeof(input) - 1)
                 {
-                    // std::cout << yellow << (int)c << reset << newl;
+                    std::cout << red << "File too big" << reset << newl;
+                    exit(1);
+                }
+                // if (iscntrl(c) != 0 && c != '\n' && c != 13 && c != '\b' && c != '\r' && c != '\t')
+                // {
+                //     // std::cout << yellow << (int)c << reset << newl;
+                //     break;
+                // }
+
+                //    if (isCntrlKey(c))
+                //    {
+                //        break;
+                //    }
+                if (!(c > 31) || !(c < 127))
+                {
                     break;
                 }
-                
 
-            //    if (isCntrlKey(c))
-            //    {
-            //        break;
-            //    }
                 if (input_count < strlen(input))
                 {
                     for(int i = 0 ; i < strlen(input) - input_count ; i++)
@@ -346,12 +345,27 @@ int main(int argc, char *argv[1])
                         input[input_count + i] = input[input_count + i + 1];
                     }
                 }
-                cursor_x++;
 
-                input[input_count] = c;
-                input_count++;
-                line_length++;
-                break;
+                if (c == 13)
+                {
+                    line_count++;
+                    input_count++;
+                    input[input_count] = '\n';
+
+                    cursor_y++;
+                    cursor_x = 1;
+                    break;  
+                }
+                else
+                {
+
+                    cursor_x++;
+
+                    input[input_count] = c;
+                    input_count++;
+                    line_length++;
+                    break;
+                }
             }
         }
         screen_refresh();
