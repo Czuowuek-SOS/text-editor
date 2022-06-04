@@ -283,7 +283,16 @@ int main(int argc, char *argv[1])
             }
             */
             // ansi escape sequences
+            case 13:
+            {
+                    line_count++;
+                    input_count++;
+                    input[input_count] = '\n';
 
+                    cursor_y++;
+                    cursor_x = 1;
+                    break;  
+            }
             case '\b':
             {
                 if (input_count > 0)
@@ -345,27 +354,14 @@ int main(int argc, char *argv[1])
                         input[input_count + i] = input[input_count + i + 1];
                     }
                 }
+           
 
-                if (c == 13)
-                {
-                    line_count++;
-                    input_count++;
-                    input[input_count] = '\n';
+                cursor_x++;
 
-                    cursor_y++;
-                    cursor_x = 1;
-                    break;  
-                }
-                else
-                {
-
-                    cursor_x++;
-
-                    input[input_count] = c;
-                    input_count++;
-                    line_length++;
-                    break;
-                }
+                input[input_count] = c;
+                input_count++;
+                line_length++;
+                break;
             }
         }
         screen_refresh();
