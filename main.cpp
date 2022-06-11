@@ -1,4 +1,3 @@
-// wielki sex
 #include <iostream>
 #include <string>
 
@@ -343,7 +342,7 @@ int main(int argc, char *argv[1])
                 //    {
                 //        break;
                 //    }
-                if (!(c > 31) || !(c < 127))
+                if (!(c > 31 && c < 127))
                 {
                     break;
                 }
@@ -365,6 +364,7 @@ int main(int argc, char *argv[1])
                 break;
             }
         }
+
         screen_refresh();
     }
     
@@ -486,5 +486,6 @@ void clear(void)
     // #else
     //     system("clear");
     // #endif
-    std::cout << "\033[2J\033[1;1H";
+    std::cout << "\033[H\033[2J\033[3J";
+    // std::cout << "\033[2J\033[1;1H";
 }
