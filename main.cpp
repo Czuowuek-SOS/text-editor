@@ -285,13 +285,13 @@ int main(int argc, char *argv[1])
             // ansi escape sequences
             case 13:
             {
-                    line_count++;
-                    input_count++;
-                    input[input_count] = '\n';
+                input[input_count] = '\n';
+                line_count++;
+                input_count++;
 
-                    cursor_y++;
-                    cursor_x = 1;
-                    break;  
+                cursor_y++;
+                cursor_x = 1;
+                break;  
             }
             case '\b':
             {
