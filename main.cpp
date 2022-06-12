@@ -239,6 +239,7 @@ int main(int argc, char *argv[1])
                     if(input[input_count] == '\n')
                     {
                         line_count--;
+
                         cursor_y--;
                         cursor_x = lines_size[line_count];
                     }
@@ -254,11 +255,12 @@ int main(int argc, char *argv[1])
                 if (input_count < strlen(input))
                 {
                     input_count++;
+                    input_count++;
                     if(input[input_count] == '\n')
                     {
                         line_count++;
-                        cursor_y++;
 
+                        cursor_y++;
                         cursor_x = 0;
                     }
                     else
@@ -297,30 +299,32 @@ int main(int argc, char *argv[1])
             {
                 if (input_count > 0)
                 {
-                    input_count--;
                     if(input_count < strlen(input))
                     {
                         for(int i = input_count; i < strlen(input); i++)
                         {
-                            input[i] = input[i + 1];
+                            input[input_count + i] = input[i + 1];
                         }
                     }
+
                     if(input[input_count] == '\n')
                     {
                         line_count--;
                         cursor_y--;
-                        cursor_x = 0;
+                        cursor_x = lines_size[line_count];
                     }
                     else
                     {
                         cursor_x--;
                         lines_size[line_count]--;
                     }
+
+                    input_count--;
                     input[input_count] = 0;
-                    for(int i = input_count ; i < strlen(input) ; i++)
-                    {
-                        input[i] = input[i + 1];
-                    }
+                    // for(int i = input_count ; i < strlen(input) ; i++)
+                    // {
+                    //     input[i] = input[i + 1];
+                    // }
                 }
                 break;
             }
