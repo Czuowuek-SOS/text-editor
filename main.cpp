@@ -100,7 +100,7 @@ int cursor_y = 1;
 
 int width;
 int height;
-char input[512];
+char input[512]; // sex
 bool program_started = false;
 int main(int argc, char *argv[1])
 {
