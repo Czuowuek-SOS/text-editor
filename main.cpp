@@ -8,7 +8,7 @@
 #if defined _WIN32
     #include <Windows.h>
     #include <conio.h>
-    /* for eliminate error */
+    /* for eliminate fake error */
     #define STD_OUTPUT_HANDLE (DWORD)(0xfffffff5)
 #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__) || defined(__APPLE__)
     #include <cstring>
@@ -90,6 +90,7 @@ using std::string;
 
 void load_file(FILE *fp);
 void screen_refresh(void);
+void get_terminal_size(void);
 bool isCntrlKey(char c);
 void moveCursor(int x, int y);
 void clear(void);
@@ -100,7 +101,7 @@ int cursor_y = 1;
 
 int width;
 int height;
-char input[512]; // sex
+char input[512];
 bool program_started = false;
 int main(int argc, char *argv[1])
 {
@@ -124,35 +125,7 @@ int main(int argc, char *argv[1])
         exit(1);
     }
 
-    // get terminal size
-    #ifdef _WIN32
-        CONSOLE_SCREEN_BUFFER_INFO csbi;
-        int ret;
-        ret = GetConsoleScreenBufferInfo(GetStdHandle( STD_OUTPUT_HANDLE ), &csbi);
-        if(ret)
-        {
-            width  = csbi.dwSize.X;
-            height = csbi.dwSize.Y;
-        }
-        else
-        {
-            std::cout << red << "Error getting terminal size - 0" << reset << newl;
-            exit(1);
-        }
-
-    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__) || defined(__APPLE__)
-        struct winsize w;
-        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-        width = w.ws_col;
-        height = w.ws_row;
-    #endif
-    if (width == 0 || height == 0)
-    {
-        clear();
-        std::cout << red << "Error getting terminal size - 1" << reset << newl;
-        exit(1);
-    }
-
+    get_terminal_size();
     clear();
     // load_file(fp);
     screen_refresh();
@@ -192,17 +165,7 @@ int main(int argc, char *argv[1])
             }
             case CTRL('R'):
             {
-                FILE *fp2 = fopen("program.exe", "r");
-                if (fp2 != NULL)
-                {
-                    fclose(fp2);
-                    remove("program.exe");
-                }
-                clear();
-                system("g++ main.cpp -o program.exe && .\\program.exe");
-
-                std::cout << "Press any key to continue..." << newl;
-                getch();
+                get_terminal_size();
             }
             // arrow keys
 
@@ -451,6 +414,38 @@ void screen_refresh(void)
     moveCursor(cursor_x, cursor_y);
 }
 
+void get_terminal_size()
+{
+    #ifdef _WIN32
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        int ret;
+        ret = GetConsoleScreenBufferInfo(GetStdHandle( STD_OUTPUT_HANDLE ), &csbi);
+        if(ret)
+        {
+            width  = csbi.dwSize.X;
+            height = csbi.dwSize.Y;
+        }
+        else
+        {
+            std::cout << red << "Error getting terminal size - 0" << reset << newl;
+            exit(1);
+        }
+
+    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__) || defined(__APPLE__)
+        struct winsize w;
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+        width = w.ws_col;
+        height = w.ws_row;
+    #endif
+    if (width == 0 || height == 0)
+    {
+        clear();
+        std::cout << red << "Error getting terminal size - 1" << reset << newl;
+        exit(1);
+    }
+
+}
+
 void load_file(FILE* fp)
 {   
     int i = 0;
@@ -481,7 +476,6 @@ void moveCursor(int x, int y)
 {
     printf("\033[%d;%dH", y, x);
 }
-
 
 void clear(void)
 {
