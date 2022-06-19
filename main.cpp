@@ -482,20 +482,11 @@ void load_file(FILE* fp)
 {   
     int i = 0;
     char c;
-    while (true)
+    // load file content to input
+    while((c = fgetc(fp)) != EOF)
     {
-        c = fgetc(fp);
-        if (c != EOF)
-        {
-            input[i] = c;
-            i++;
-        }
-        else
-        {
-            input[i] = '\0';
-            break;
-        }
-
+        input[i] = c;
+        i++;
     }
 }
 
