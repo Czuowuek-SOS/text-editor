@@ -119,21 +119,53 @@ int main(int argc, char *argv[1])
     }
 
     FILE *fp = fopen(argv[1], "r+");
-    if(fp == NULL)
+    if (fp == NULL)
     {
         std::cout << red << "File not found" << reset << newl;
         exit(1);
     }
+
+
 
     get_terminal_size();
     clear();
     // load_file(fp);
     screen_refresh();
     program_started = true;
+
+
     int lines_size[height];
     int input_count = 0;
     int line_count  = 1;
     int line_length = 0;
+    if (atoi(argv[2]) == 1)
+    {
+        load_file(fp);
+        // get line count in input
+        for (int i = 0; i < strlen(input); i++)
+        {
+            if (input[i] == newl)
+            {
+                line_count++;
+            }
+        }
+        // get lines size in input
+        for (int i = 0; i < strlen(input); i++)
+        {
+            if (input[i] == newl)
+            {
+                lines_size[line_count - 1] = line_length;
+                line_length = 0;
+            }
+            else
+            {
+                line_length++;
+            }
+        }
+        input_count = strlen(input);
+
+    }
+
     char c;
     while (true)
     {
