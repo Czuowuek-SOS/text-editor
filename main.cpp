@@ -130,7 +130,6 @@ int main(int argc, char *argv[1])
     get_terminal_size();
     clear();
     // load_file(fp);
-    screen_refresh();
     program_started = true;
 
 
@@ -164,7 +163,10 @@ int main(int argc, char *argv[1])
         }
         input_count = strlen(input);
 
+        cursor_x = lines_size[line_count - 1] + 1;
+        cursor_y = line_count;
     }
+    screen_refresh();
 
     char c;
     while (true)
