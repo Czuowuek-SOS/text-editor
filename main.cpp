@@ -1,3 +1,4 @@
+// pisanie tego to bul
 #include <iostream>
 #include <string>
 
