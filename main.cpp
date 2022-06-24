@@ -1,4 +1,3 @@
-// pisanie tego to bul
 #include <iostream>
 #include <string>
 
@@ -164,7 +163,7 @@ int main(int argc, char *argv[1])
         }
         input_count = strlen(input);
 
-        cursor_x = lines_size[line_count - 1] + 1;
+        cursor_x = lines_size[--line_count] + 1;
         cursor_y = line_count;
     }
     screen_refresh();
