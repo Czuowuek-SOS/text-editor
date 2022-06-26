@@ -232,7 +232,6 @@ int main(int argc, char *argv[1])
             {
                 if (input_count > 0)
                 {
-                    input_count--;
                     if(input[input_count] == '\n')
                     {
                         line_count--;
@@ -245,14 +244,14 @@ int main(int argc, char *argv[1])
                         cursor_x--;
                     }
                 }
+                input_count--;
                 break;
             }
             case arrow_right:
             {
                 if (input_count < strlen(input))
                 {
-                    input_count++;
-                    input_count++;
+
                     if(input[input_count] == '\n')
                     {
                         line_count++;
@@ -265,6 +264,7 @@ int main(int argc, char *argv[1])
                         cursor_x++;
                     }
                 }
+                input_count++;
                 break;
             }
             // scroll screen
