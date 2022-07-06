@@ -1,4 +1,3 @@
-// wielki sex
 #include <iostream>
 #include <string>
 
@@ -100,6 +99,8 @@ void clear(void);
 int cursor_x = 1;
 int cursor_y = 1;
 
+string file_name;
+
 int width;
 int height;
 char input[512];
@@ -119,6 +120,8 @@ int main(int argc, char *argv[1])
         std::cout << red << "Expected arguments" << reset << newl;
     }
 
+    file_name = argv[1];
+
     FILE *fp = fopen(argv[1], "r+");
     if (fp == NULL)
     {
@@ -132,7 +135,6 @@ int main(int argc, char *argv[1])
     clear();
     // load_file(fp);
     program_started = true;
-
 
     int lines_size[height];
     int input_count = 0;
@@ -439,7 +441,7 @@ void screen_refresh(void)
     {
         std::cout << green << "~" << reset << newl;
     }
-    string info = "lines: " + std::to_string(line_count) + " | " + "chars: " + std::to_string(chars_count);
+    string info = "lines: " + std::to_string(line_count) + " | " + "chars: " + std::to_string(chars_count) + ' ' + '[' + file_name + ']';
     std::cout << bg_blue << info;
     for(int i = 0 ; i < (width - info.length()) ; i++)
     {
