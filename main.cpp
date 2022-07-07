@@ -295,6 +295,14 @@ int main(int argc, char *argv[1])
                 cursor_x = 1;
                 break;  
             }
+            case '\t':
+            {
+                input[input_count] = '\t';
+                input_count++;
+
+                cursor_x += 3;
+                break;
+            }
             case '\b':
             {
                 if (input_count > 0)
